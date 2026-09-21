@@ -242,6 +242,26 @@ bool HalGPIO::verifyPowerButtonWakeup() {
   return heldAtFirstSample && inputMgr.isPowerButtonPhysicallyPressed();
 }
 
+bool HalGPIO::waitForPowerButtonHold(unsigned long holdMs) {
+  if (BoardConfig::isPaperMono() || BoardConfig::isM5PaperV11() || BoardConfig::ACTIVE.input.power < 0) {
+    return true;
+  }
+
+  // millis() counts from the wake reset, so boot time already counts toward the hold.
+  // Contact bounce must not abort a genuine hold: require consecutive released samples.
+  constexpr uint8_t RELEASED_SAMPLES_TO_ABORT = 3;
+  uint8_t releasedSamples = 0;
+  while (millis() < holdMs) {
+    inputMgr.update();
+    releasedSamples = inputMgr.isPowerButtonPhysicallyPressed() ? 0 : releasedSamples + 1;
+    if (releasedSamples >= RELEASED_SAMPLES_TO_ABORT) {
+      return false;
+    }
+    delay(5);
+  }
+  return true;
+}
+
 bool HalGPIO::isUsbConnected() const {
   if (deviceIsX3()) {
     // X3: infer USB/charging via BQ27220 Current() register (0x0C, signed mA).

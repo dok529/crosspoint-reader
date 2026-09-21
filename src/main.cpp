@@ -62,6 +62,7 @@ static unsigned long lastX4ProPowerClickAt = 0;
 namespace {
 constexpr unsigned long X4PRO_POWER_DOUBLE_CLICK_MS = 500;
 constexpr unsigned long X4PRO_POWER_CLICK_MAX_HOLD_MS = 300;
+constexpr unsigned long POWER_ON_HOLD_MS = 800;
 }  // namespace
 
 // A wake hold must never become an in-app power-button action.  Boot may continue
@@ -450,10 +451,9 @@ void setup() {
 
   switch (wakeupReason) {
     case HalGPIO::WakeupReason::PowerButton:
-      // With Short Power Button Press = Sleep, a single click wakes on any
-      // device; otherwise the button must still be held (ghost-wake debounce).
-      if (!wakeHoldVerified && SETTINGS.shortPwrBtn != CrossPointSettings::SHORT_PWRBTN::SLEEP) {
-        LOG_DBG("MAIN", "Power-button wake not held through verification, sleeping");
+      // Powering on requires a deliberate hold; also filters ghost wakes.
+      if (!wakeHoldVerified || !gpio.waitForPowerButtonHold(POWER_ON_HOLD_MS)) {
+        LOG_DBG("MAIN", "Power button not held for %lu ms, sleeping", POWER_ON_HOLD_MS);
         Storage.prepareForDeepSleep();
         powerManager.startDeepSleep(gpio);
       }

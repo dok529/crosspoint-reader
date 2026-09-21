@@ -115,6 +115,11 @@ class HalGPIO {
   // Should only be called when wakeup reason is PowerButton.
   bool verifyPowerButtonWakeup();
 
+  // Blocks until holdMs have elapsed since reset with the power button held. Returns false if it is released first,
+  // in which case the device should return to sleep. Boards whose wake click cannot be sampled
+  // (see verifyPowerButtonWakeup) return true immediately.
+  bool waitForPowerButtonHold(unsigned long holdMs);
+
   // Check if USB is connected
   bool isUsbConnected() const;
 

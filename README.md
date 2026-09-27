@@ -14,6 +14,13 @@ Check [our Devices page](https://crosspointreader.com/devices) for the full list
 
 > If you're planning to buy an Xteink device, consider purchasing an **X3/X4 Developer Edition** through https://crosspointreader.com. CrossPoint receives a small share of each sale, helping fund development costs.
 
+## About this fork
+
+This fork ([dok529/crosspoint-reader](https://github.com/dok529/crosspoint-reader)) tracks upstream CrossPoint Reader and adds:
+
+- **Docker build toolchain** ([docker/Dockerfile](docker/Dockerfile), [scripts/docker-pio.sh](scripts/docker-pio.sh)): builds firmware in a container that mirrors the CI toolchain (PlatformIO, clang-format), without installing PlatformIO on the host. `scripts/docker-pio.sh run -e <env>` builds, `--format` runs `./bin/clang-format-fix -g`, `--export <env>` copies the built `firmware*.bin` to `build/<env>/`.
+- **USB flash wrapper** ([scripts/usb-flash.sh](scripts/usb-flash.sh)): flashes an exported `build/<env>/firmware.bin` to the OTA app partition over USB via `esptool`, the same partition the "Custom .bin" uploader at [crosspointreader.com/#flash-tools](https://crosspointreader.com/#flash-tools) writes to. Needs `esptool` in a local `.venv` (`python3 -m venv .venv && .venv/bin/pip install esptool`); the bootloader and partition table are left untouched.
+
 ## What can CrossPoint do?
 
 - **Reader engine**: EPUB 2/3 rendering with embedded-style option, image handling, hyphenation, kerning, adaptive table layouts, native CJK ruby annotations, chapter navigation, footnotes, bookmarks, dictionary lookups ([StarDict](docs/dictionary.md)), go-to-percent, auto page turn, orientation control, focus reading, KOReader progress sync and more.

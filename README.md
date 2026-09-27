@@ -14,6 +14,12 @@ Check [our Devices page](https://crosspointreader.com/devices) for the full list
 
 > If you're planning to buy an Xteink device, consider purchasing an **X3/X4 Developer Edition** through https://crosspointreader.com. CrossPoint receives a small share of each sale, helping fund development costs.
 
+## About this fork
+
+This fork ([dok529/crosspoint-reader](https://github.com/dok529/crosspoint-reader)) tracks upstream CrossPoint Reader and adds:
+
+- **Power-on requires an 800 ms hold** ([lib/hal/HalGPIO.cpp](lib/hal/HalGPIO.cpp), [src/main.cpp](src/main.cpp)): waking from deep sleep or a cold boot via the power button requires holding it for 800 ms from reset, including with "Short Power Button Press = Sleep" set, so the device can't turn itself on in a bag or pocket. Builds from this fork identify as `<version>-sts`.
+
 ## What can CrossPoint do?
 
 - **Reader engine**: EPUB 2/3 rendering with embedded-style option, image handling, hyphenation, kerning, adaptive table layouts, native CJK ruby annotations, chapter navigation, footnotes, bookmarks, dictionary lookups ([StarDict](docs/dictionary.md)), go-to-percent, auto page turn, orientation control, focus reading, KOReader progress sync and more.
